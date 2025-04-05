@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>thesaurus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/vis-network@9.1.2/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .top-menu {
+            background-color: yellow;
+            padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .marquee {
+            white-space: nowrap;
+            overflow: hidden;
+            display: block;
+            font-size: 16px;
+            color: black;
+        }
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 10s linear infinite;
+        }
+        @keyframes marquee {
+            from { transform: translateX(0%); }
+            to { transform: translateX(-100%); }
+        }
+        .main-container {
+            display: flex;
+            gap: 20px;
+        }
+        .left-panel {
+            width: 50%;
+        }
+        .right-panel {
+            width: 50%;
+            border-left: 2px solid #ddd;
+            padding-left: 20px;
+        }
+        #visualization {
+            height: 500px;
+            background-color: #f8f9fa;
+            border: 2px solid #030303;
+        }
+        #loadingIndicator {
+            display: none;
+            font-size: 18px;
+            color: blue;
+            margin-top: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 255, 0.3);
+            border-top: 4px solid blue;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-menu">
+        <div class="marquee">
+            <span>🏁 Добро пожаловать на наш сайт тезауруса! Последние обновления и новости здесь!</span>
+        </div>
+    </div>  
+    <div class="container text-center mt-5" id="checkServerSection">
+        <h1>Проверка связи с сервером</h1>
+        <div id="loadingIndicator" class="spinner mx-auto mt-2" style="display: none;"></div>
+        <button id="checkServerBtn" class="btn btn-primary mt-3">Проверить</button>
+        <p id="serverStatus" class="mt-3"></p>
+    </div>
+    <div class="container mt-5" id="neo4jSection" style="display: none;">
+        <div class="main-container">
+            <div class="left-panel">
+                <h2>Данные в БД Neo4j</h2>
+                <!-- <button id="loadDataBtn" class="btn btn-info">Обновить данные</button>
+                <button id="createRelationBtn" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#relationModal">Создать отношение</button> -->
+                <!-- Кнопки Обновить данные и Создать отношение -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <button id="loadDataBtn" class="btn btn-info me-2">Обновить данные</button>
+                        <div class="btn-group">
+                            <button id="createRelationBtn" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Создать отношение
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="UF">UF</a></li>
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="NT">NT</a></li>
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="RT">RT</a></li>
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="BT">BT</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="dataContainer" class="mt-3"></div>
+                <hr>
+            
+                <!-- Добавить Класс -->
+                <h3>Добавить Класс</h3>
+                <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
+                <input type="text" id="className" class="form-control mb-2" placeholder="Введите имя класса">
+                <button id="addClassBtn" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="Класс">Добавить</button>
+            
+                <!-- Добавить Подкласс -->
+                <h3 class="mt-4">Добавить Подкласс</h3>
+                <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
+                <select id="parentClassSelect" class="form-control mb-2">
+                    <option value="">Выберите родительский класс</option>
+                </select>
+                <input type="text" id="subclassName" class="form-control mb-2" placeholder="Подкласс">
+                <button id="addSubclassBtn" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="Подкласс">Добавить</button>   
+            
+                <!-- Добавить Термин -->
+                <h3 class="mt-4">Добавить Термин</h3>
+                <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
+                <select id="subclassSelect" class="form-control mb-2">
+                    <option value="">Выберите подкласс</option>
+                </select>
+                <input type="text" id="termName" class="form-control mb-2" placeholder="Термин">
+                <button id="addTermBtn" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="Термин">Добавить</button>
+            </div>
+            
+    
+            <div class="right-panel">
+                <h2>Визуализация</h2>
+                <div id="visualization"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для создания отношения -->
+    <div class="modal fade" id="relationModal" tabindex="-1" aria-labelledby="relationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="relationModalLabel">Создать отношение</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="relationTypeText"></p>
+                    
+                    <!-- Выбор первого термина -->
+                    <h6>Термин 1</h6>
+                    <select id="classSelect1" class="form-select mb-2"></select>
+                    <select id="subclassSelect1" class="form-select mb-2"></select>
+                    <select id="termSelect1" class="form-select mb-2"></select>
+                    
+                    <!-- Выбор второго термина -->
+                    <h6>Термин 2</h6>
+                    <select id="classSelect2" class="form-select mb-2"></select>
+                    <select id="subclassSelect2" class="form-select mb-2"></select>
+                    <select id="termSelect2" class="form-select mb-2"></select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveRelationBtn">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно для языков -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Добавление</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="modalForm">
+                        <div class="mb-3">
+                            <label id="modalLabelRu" class="form-label"></label>
+                            <input type="text" id="modalInputRu" class="form-control" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label id="modalLabelKz" class="form-label"></label>
+                            <input type="text" id="modalInputKz" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label id="modalLabelEn" class="form-label"></label>
+                            <input type="text" id="modalInputEn" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveModalBtn">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        
+        // При открытии модального окна загружаем классы
+        $(document).on("click", ".relation-option", function (event) {
+            event.preventDefault();
+            
+            const relationType = $(this).data("relation-type");
+            console.log("Нажатие на элемент списка с типом:", relationType);
+            
+            $('#relationModal').modal('show');
+            $('#relationTypeText').text(relationType);
+            
+            
+            // Загружаем классы для обеих колонок
+            loadClassesModule("classSelect1");
+            loadClassesModule("classSelect2");
+        });
+
+        // При изменении класса загружаем подклассы
+        $("#classSelect1").change(function() {
+            const selectedClass = $(this).val();
+            loadSubClassesModule(selectedClass, "subclassSelect1");
+        });
+
+        $("#classSelect2").change(function() {
+            const selectedClass = $(this).val();
+            loadSubClassesModule(selectedClass, "subclassSelect2");
+        });
+
+        // При изменении подкласса загружаем термины
+        $("#subclassSelect1").change(function() {
+            const selectedSubclass = $(this).val();
+            loadTermsModule(selectedSubclass, "termSelect1");
+        });
+
+        $("#subclassSelect2").change(function() {
+            const selectedSubclass = $(this).val();
+            loadTermsModule(selectedSubclass, "termSelect2");
+        });
+
+        // Функция для отправки данных на сервер
+        function createRelation(term1, term2, relationType) {
+            console.log("Отправляем на сервер:", {
+                term1: term1,
+                term2: term2,
+                relationType: relationType // Посмотрим, что именно отправляется
+            });
+
+            fetch("http://127.0.0.1:8000/create_relation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    term1: term1,
+                    term2: term2,
+                    relationType: relationType
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Ответ сервера:", data);
+                if (data.message === "Связь успешно создана") {
+                // Закрытие модального окна
+                    $('#relationModal').modal('hide');
+                } else {
+                    alert("Произошла ошибка: " + (data.error || "Неизвестная ошибка"));
+                }
+            })
+            .catch(error => console.error("Ошибка:", error));
+        }
+
+        // Отслеживаем выбор терминов
+        let selectedTerm1 = null;
+        let selectedTerm2 = null;
+
+        // Когда выбрали термин 1
+        $("#termSelect1").change(function() {
+            selectedTerm1 = $(this).val();
+            checkAndCreateRelation();
+        });
+
+        // Когда выбрали термин 2
+        $("#termSelect2").change(function() {
+            selectedTerm2 = $(this).val();
+            checkAndCreateRelation();
+        });
+
+
+        // Нажатие на кнопку "Сохранить"
+        $("#saveRelationBtn").click(function() {
+            if (selectedTerm1 && selectedTerm2) {
+                const relationType = $('#relationTypeText').text();
+                createRelation(selectedTerm1, selectedTerm2, relationType);
+            } else {
+                alert("Пожалуйста, выберите оба термина перед сохранением.");
+            }
+        });
+
+        // Загрузка всех классов
+        function loadClassesModule(selectElementId) {
+            fetch("http://127.0.0.1:8000/classes")
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Полученные классы:", data);
+                    const select = document.getElementById(selectElementId);
+                    select.innerHTML = '<option value="">Выберите класс</option>';
+                    data.classes.forEach(className => {
+                        let option = document.createElement("option");
+                        option.value = className;
+                        option.textContent = className;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Ошибка загрузки классов:", error));
+        }
+
+        // Загрузка подклассов
+        function loadSubClassesModule(className, selectElementId) {
+            if (!className) return;
+
+            fetch(`http://127.0.0.1:8000/subclasses/${className}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Полученные подклассы:", data);
+                    const select = document.getElementById(selectElementId);
+                    select.innerHTML = '<option value="">Выберите подкласс</option>';
+                    data.subclasses.forEach(subclassName => {
+                        let option = document.createElement("option");
+                        option.value = subclassName;
+                        option.textContent = subclassName;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Ошибка загрузки подклассов:", error));
+        }
+
+        // Загрузка терминов
+        function loadTermsModule(subclassName, selectElementId) {
+            if (!subclassName) return;
+
+            fetch(`http://127.0.0.1:8000/terms/${subclassName}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Полученные термины:", data);
+                    const select = document.getElementById(selectElementId);
+                    select.innerHTML = '<option value="">Выберите термин</option>';
+                    data.terms.forEach(termName => {
+                        let option = document.createElement("option");
+                        option.value = termName;
+                        option.textContent = termName;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Ошибка загрузки терминов:", error));
+        }
+
+
+        // модальное окно для добавление классов, подклассов и терминов на разных языках
+        $(document).ready(function () {
+            function openModal(type, inputValue) {
+                let labelText = {
+                    "Класс": { ru: "Заполнен класс на русском:", kz: "Заполните класс на казахском:", en: "Заполните класс на английском:" },
+                    "Подкласс": { ru: "Заполнен подкласс на русском:", kz: "Заполните подкласс на казахском:", en: "Заполните подкласс на английском:" },
+                    "Термин": { ru: "Заполнен термин на русском:", kz: "Заполните термин на казахском:", en: "Заполните термин на английском:" }
+                };
+
+                $("#modalLabel").text("Добавить " + type);
+                $("#modalLabelRu").text(labelText[type].ru);
+                $("#modalLabelKz").text(labelText[type].kz);
+                $("#modalLabelEn").text(labelText[type].en);
+                $("#modalInputRu").val(inputValue);
+                $("#modalInputKz").val("");
+                $("#modalInputEn").val("");
+
+                $("#saveModalBtn").data("type", type);
+            }
+
+            $("#addClassBtn").click(function () {
+                let className = $("#className").val().trim();
+                if (className) openModal("Класс", className);
+            });
+
+            $("#addSubclassBtn").click(function () {
+                let subclassName = $("#subclassName").val().trim();
+                if (subclassName) openModal("Подкласс", subclassName);
+            });
+
+            $("#addTermBtn").click(function () {
+                let termName = $("#termName").val().trim();
+                if (termName) openModal("Термин", termName);
+            });
+
+            $("#saveModalBtn").click(function () {
+                let type = $(this).data("type");
+                let ru = $("#modalInputRu").val().trim();
+                let kz = $("#modalInputKz").val().trim();
+                let en = $("#modalInputEn").val().trim();
+                let parent = null;  // <-- Добавляем инициализацию 
+
+                if (!ru) {
+                    alert("Основное поле (русский) не может быть пустым!");
+                    return;
+                }
+
+                // Если добавляется подкласс, то берем выбранный родительский класс
+                if (type === "Подкласс") {
+                    parent = $("#parentClassSelect").val();  // Выпадающий список с классами
+                    if (!parent) {
+                        alert("Выберите родительский класс!");
+                        return;
+                    }
+                }
+
+                if (type === "Термин") {
+                    parent = $("#subclassSelect").val();  // Выпадающий список с классами
+                    if (!parent) {
+                        alert("Выберите родительский класс!");
+                        return;
+                    }
+                }
+
+                let requestData = {
+                    type: type,
+                    ru: ru,
+                    kz: kz,
+                    en: en,
+                    parent: parent  // Добавляем родителя
+                };
+
+                fetch("http://127.0.0.1:8000/add_node/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Данные успешно добавлены!");
+                        loadGraph();
+                        $("#confirmationModal").modal("hide");
+                        
+                        // Очистка полей после добавления
+                        $("#className").val("");
+                        $("#subclassName").val("");
+                        $("#termName").val("");
+                        
+                        // Обновление выпадающих списков
+                        loadClasses();
+                        loadSubclasses();
+                        loadTerms();
+                    } else {
+                        alert("Ошибка: " + data.detail);
+                    }
+                }).catch(error => console.error("Ошибка при добавлении узла:", error));
+            });
+        });
+
+
+        // кнопка проверка сервера
+        document.getElementById("checkServerBtn").addEventListener("click", function() {
+            const statusElement = document.getElementById("serverStatus");
+            const loadingIndicator = document.getElementById("loadingIndicator");
+
+            // Показываем индикатор загрузки перед запросом
+            loadingIndicator.style.display = "block";
+            statusElement.innerHTML = "";
+
+            fetch("http://127.0.0.1:8000/")
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(() => {
+                        statusElement.innerHTML = "<span class='text-success'>Сервер работает!</span>";
+                        setTimeout(() => {
+                            document.getElementById("checkServerSection").style.display = "none";
+                            document.getElementById("neo4jSection").style.display = "block";
+                            loadGraph();  // Загружаем граф
+                        }, 1000);
+                    }, 500);
+                })
+                .catch(error => {
+                    setTimeout(() => {
+                        statusElement.innerHTML = "<span class='text-danger'>Ошибка: сервер не отвечает!</span>";
+                    }, 500);
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        loadingIndicator.style.display = "none"; // Скрываем индикатор после задержки
+                    }, 1000);
+                });
+        });
+
+        // загрузка всех классов
+        function loadClasses() {
+            fetch("http://127.0.0.1:8000/get_classes")
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById("parentClassSelect");
+                    select.innerHTML = '<option value="">Выберите родительский класс</option>';
+                    data.classes.forEach(className => {
+                        let option = document.createElement("option");
+                        option.value = className;
+                        option.textContent = className;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Ошибка загрузки классов:", error));
+        }
+
+          // загрузка всех классов
+          function loadSubClasses() {
+            fetch("http://127.0.0.1:8000/get_subclasses")
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById("subclassSelect");
+                    select.innerHTML = '<option value="">Выберите родительский подкласс</option>';
+                    data.subclasses.forEach(className => {
+                        let option = document.createElement("option");
+                        option.value = className;
+                        option.textContent = className;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Ошибка загрузки классов:", error));
+        }
+
+        $(document).ready(function () {
+            loadClasses(); 
+        });
+
+        
+        $(document).ready(function () {
+            loadSubClasses(); 
+        });
+
+
+        // обновление данных из бд при нажаите на кнопку
+        document.getElementById("loadDataBtn").addEventListener("click", function() {
+            loadGraph();
+        });
+
+        // визуализация
+        function loadGraph() {
+            fetch("http://127.0.0.1:8000/graph_data")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("visualization").innerHTML = "<span class='text-danger'>Ошибка загрузки графа: " + data.error + "</span>";
+                        return;
+                    }
+
+                    // Создание контейнера
+                    document.getElementById("visualization").innerHTML = "";
+                    var container = document.getElementById("visualization");
+
+                    // var nodes = new vis.DataSet(data.nodes);
+                    var nodes = new vis.DataSet(
+                        data.nodes.map(node => {
+                            console.log("Тип узла:", node.group, "Имя:", node.label); // Проверяем, что данные есть
+
+                            let nodeType = (node.group || "").toLowerCase(); // Берем group вместо type
+                            let color = "#999999";  // Серый по умолчанию
+                            let size = 30; // Базовый размер
+
+                            if (nodeType === "class") {
+                                color = "#007bff"; // Синий для классов
+                            } else if (nodeType === "subclass") {
+                                color = "#28a745"; // Зелёный для подклассов
+                            } else if (nodeType === "term") {
+                                color = "#ffc107"; // Жёлтый для терминов
+                            } else if (nodeType === "translate") {
+                                color = "#a020f0"; // Фиолетовый для перевод терминов
+                            } 
+
+                            return {
+                                id: node.id,
+                                label: node.label,
+                                color: { background: color, border: "#000000" },
+                                font: { color: "black", size: 16 },
+                                scaling: { min: 10, max: 100 }
+                            };
+                        })
+                    );
+                    var edges = new vis.DataSet(data.edges);
+
+                    var graphData = { nodes: nodes, edges: edges };
+
+                    var options = {
+                        edges: {
+                            arrows: "to",
+                            color: "#848484",
+                            smooth: true
+                        },
+                        physics: {
+                            enabled: true
+                        }
+                    };
+
+                    new vis.Network(container, graphData, options);
+                })
+                .catch(error => {
+                    document.getElementById("visualization").innerHTML = "<span class='text-danger'>Ошибка загрузки графа</span>";
+                    console.error("Ошибка загрузки графа:", error);
+                });
+        }
+
+
+    </script>
+</body>
+</html>

@@ -252,7 +252,7 @@
                 relationType: relationType // Посмотрим, что именно отправляется
             });
 
-            fetch("http://127.0.0.1:8000/create_relation", {
+            fetch("https://thesaurus-api-ntx3.onrender.com/create_relation", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -305,7 +305,7 @@
 
         // Загрузка всех классов
         function loadClassesModule(selectElementId) {
-            fetch("http://127.0.0.1:8000/classes")
+            fetch("https://thesaurus-api-ntx3.onrender.com/classes")
                 .then(response => response.json())
                 .then(data => {
                     console.log("Полученные классы:", data);
@@ -325,7 +325,7 @@
         function loadSubClassesModule(className, selectElementId) {
             if (!className) return;
 
-            fetch(`http://127.0.0.1:8000/subclasses/${className}`)
+            fetch(`https://thesaurus-api-ntx3.onrender.com/subclasses/${className}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("Полученные подклассы:", data);
@@ -345,7 +345,7 @@
         function loadTermsModule(subclassName, selectElementId) {
             if (!subclassName) return;
 
-            fetch(`http://127.0.0.1:8000/terms/${subclassName}`)
+            fetch(`https://thesaurus-api-ntx3.onrender.com/terms/${subclassName}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("Полученные термины:", data);
@@ -434,7 +434,7 @@
                     parent: parent  // Добавляем родителя
                 };
 
-                fetch("http://127.0.0.1:8000/add_node/", {
+                fetch("https://thesaurus-api-ntx3.onrender.com/add_node/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(requestData)
@@ -472,7 +472,7 @@
             loadingIndicator.style.display = "block";
             statusElement.innerHTML = "";
 
-            fetch("http://127.0.0.1:8000/")
+            fetch("https://thesaurus-api-ntx3.onrender.com/")
                 .then(response => response.json())
                 .then(data => {
                     setTimeout(() => {
@@ -498,7 +498,7 @@
 
         // загрузка всех классов
         function loadClasses() {
-            fetch("http://127.0.0.1:8000/get_classes")
+            fetch("https://thesaurus-api-ntx3.onrender.com/get_classes")
                 .then(response => response.json())
                 .then(data => {
                     const select = document.getElementById("parentClassSelect");
@@ -515,7 +515,7 @@
 
           // загрузка всех классов
           function loadSubClasses() {
-            fetch("http://127.0.0.1:8000/get_subclasses")
+            fetch("https://thesaurus-api-ntx3.onrender.com/get_subclasses")
                 .then(response => response.json())
                 .then(data => {
                     const select = document.getElementById("subclassSelect");
@@ -547,7 +547,7 @@
 
         // визуализация
         function loadGraph() {
-            fetch("http://127.0.0.1:8000/graph_data")
+            fetch("https://thesaurus-api-ntx3.onrender.com/graph_data")
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {

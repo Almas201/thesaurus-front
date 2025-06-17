@@ -15,6 +15,7 @@
             text-align: center;
             font-size: 18px;
             font-weight: bold;
+            border-radius: 20px;
         }
         .marquee {
             white-space: nowrap;
@@ -34,13 +35,13 @@
         }
         .main-container {
             display: flex;
-            gap: 20px;
+            gap: 10px;
         }
         .left-panel {
-            width: 50%;
+            width: 80%;
         }
         .right-panel {
-            width: 50%;
+            width: 20%;
             border-left: 2px solid #ddd;
             padding-left: 20px;
         }
@@ -85,58 +86,60 @@
         <div class="main-container">
             <div class="left-panel">
                 <h2>Данные в БД Neo4j</h2>
-                <!-- <button id="loadDataBtn" class="btn btn-info">Обновить данные</button>
-                <button id="createRelationBtn" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#relationModal">Создать отношение</button> -->
-                <!-- Кнопки Обновить данные и Создать отношение -->
+
+                <hr>
+                
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <button id="loadDataBtn" class="btn btn-info me-2">Обновить данные</button>
                         <div class="btn-group">
-                            <button id="createRelationBtn" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Создать отношение
-                            </button>
+                            <button id="loadDataBtn" class="btn btn-info me-2">Обновить данные</button>
+                        </div>
+
+                        <div class="btn-group">
+                            <button id="addOptionBtn" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Добавить</button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="UF">UF</a></li>
-                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="NT">NT</a></li>
-                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="RT">RT</a></li>
-                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="BT">BT</a></li>
+                                <li><a class="dropdown-item add-option" href="#" data-add-type="class">Класс</a></li>
+                                <li><a class="dropdown-item add-option" href="#" data-add-type="subclass">Подкласс</a></li>
+                                <li><a class="dropdown-item add-option" href="#" data-add-type="term">Термин</a></li>
                             </ul>
                         </div>
+
+                        <div class="btn-group">
+                            <button id="createRelationBtn" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Создать отношение</button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="NT">NT</a></li>
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="RT">RT</a></li>
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="BT">BT</a></li>      
+                                <li><hr class="dropdown-divider"></li>  
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="UF-1">UF-1</a></li>
+                                <li><a class="dropdown-item relation-option" href="#" data-relation-type="UF-2">UF-2</a></li>
+                            </ul>
+                        </div>
+                      
+                        <div class="btn-group">
+                            <button id="deleteOptionBtn" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Удалить</button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item delete-option" href="#" data-delete-type="class">Класс</a></li>
+                                <li><a class="dropdown-item delete-option" href="#" data-delete-type="subclass">Подкласс</a></li>
+                                <li><a class="dropdown-item delete-option" href="#" data-delete-type="term">Термин</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item delete-option text-danger" href="#" data-delete-type="clear-all">Очистить все</a></li>
+                            </ul>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5>Визуализация</h5>
+                        <div id="visualization"></div>
                     </div>
                 </div>
-                <div id="dataContainer" class="mt-3"></div>
-                <hr>
-            
-                <!-- Добавить Класс -->
-                <h3>Добавить Класс</h3>
-                <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
-                <input type="text" id="className" class="form-control mb-2" placeholder="Введите имя класса">
-                <button id="addClassBtn" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="Класс">Добавить</button>
-            
-                <!-- Добавить Подкласс -->
-                <h3 class="mt-4">Добавить Подкласс</h3>
-                <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
-                <select id="parentClassSelect" class="form-control mb-2">
-                    <option value="">Выберите родительский класс</option>
-                </select>
-                <input type="text" id="subclassName" class="form-control mb-2" placeholder="Подкласс">
-                <button id="addSubclassBtn" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="Подкласс">Добавить</button>   
-            
-                <!-- Добавить Термин -->
-                <h3 class="mt-4">Добавить Термин</h3>
-                <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
-                <select id="subclassSelect" class="form-control mb-2">
-                    <option value="">Выберите подкласс</option>
-                </select>
-                <input type="text" id="termName" class="form-control mb-2" placeholder="Термин">
-                <button id="addTermBtn" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="Термин">Добавить</button>
+        
             </div>
-            
     
             <div class="right-panel">
-                <h2>Визуализация</h2>
-                <div id="visualization"></div>
+                <h2>Логи</h2>
             </div>
+
         </div>
     </div>
 
@@ -145,29 +148,14 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="relationModalLabel">Создать отношение</h5>
+                    <h5 class="modal-title" id="relationModalLabel"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p id="relationTypeText"></p>
-                    
-                    <!-- Выбор первого термина -->
-                    <h6>Термин 1</h6>
-                    <select id="classSelect1" class="form-select mb-2"></select>
-                    <select id="subclassSelect1" class="form-select mb-2"></select>
-                    <select id="termSelect1" class="form-select mb-2"></select>
-                    
-                    <!-- Выбор второго термина -->
-                    <h6>Термин 2</h6>
-                    <select id="classSelect2" class="form-select mb-2"></select>
-                    <select id="subclassSelect2" class="form-select mb-2"></select>
-                    <select id="termSelect2" class="form-select mb-2"></select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary" id="saveRelationBtn">Сохранить</button>
-                </div>
-            </div>
+                <!-- тело модального окна -->
+                <div class="modal-body"></div>
+                <!-- нижни колонтитул (кнопки) -->
+                <div class="modal-footer"></div>
+            </div>  
         </div>
     </div>
     
@@ -213,46 +201,453 @@
             const relationType = $(this).data("relation-type");
             console.log("Нажатие на элемент списка с типом:", relationType);
             
+            if (relationType === "UF-1" || relationType === "UF-2") {
+                // Открываем модальное окно для добавления синонима
+                $('#relationModal').modal('show');
+                $('#relationModalLabel').text(`Добавить синоним (${relationType})`);
+                $('#relationModal .modal-body').html(`
+                    <h6>Выберите класс</h6>
+                    <select id="ufClassSelect" class="form-select mb-2"></select>
+                    <h6>Выберите подкласс</h6>
+                    <select id="ufSubclassSelect" class="form-select mb-2"></select>
+                    <h6>Выберите термин</h6>
+                    <select id="ufTermSelect" class="form-select mb-2"></select>
+                    <hr>
+                    <h6>Синоним (на русском)</h6>
+                    <input type="text" id="ufSynonymRu" class="form-control mb-2" placeholder="Синоним на русском">
+                    <h6>Синоним (на казахском, опционально)</h6>
+                    <input type="text" id="ufSynonymKz" class="form-control mb-2" placeholder="Синоним на казахском">
+                    <h6>Синоним (на английском, опционально)</h6>
+                    <input type="text" id="ufSynonymEn" class="form-control mb-2" placeholder="Синоним на английском">
+                `);
+                $('#relationModal .modal-footer').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveUfSynonymBtn" data-uf-type="${relationType}">Сохранить</button>
+                `);
+
+                // Загрузка классов
+                loadClassesModule("ufClassSelect");
+
+                // При выборе класса — загрузить подклассы
+                $(document).off("change", "#ufClassSelect").on("change", "#ufClassSelect", function () {
+                    const selectedClass = $(this).val();
+                    loadSubClassesModule(selectedClass, "ufSubclassSelect");
+                });
+
+                // При выборе подкласса — загрузить термины
+                $(document).off("change", "#ufSubclassSelect").on("change", "#ufSubclassSelect", function () {
+                    const selectedSubclass = $(this).val();
+                    loadTermsModule(selectedSubclass, "ufTermSelect");
+                });
+            }else{
+                $('#relationModal').modal('show');
+                $('relationModal .modal-body').html("");
+                $('#relationModal .modal-footer').html("");
+                $('#relationModalLabel').text("Создать отношение между терминами");
+                
+
+                $('#relationTypeText').text(relationType);
+                $('#relationModal .modal-body').append(`
+                    <p id="relationTypeText">${relationType}</p>
+                    <h6>Термин 1</h6>
+                    <select id="classSelect1" class="form-select mb-2"></select>
+                    <select id="subclassSelect1" class="form-select mb-2"></select>
+                    <select id="termSelect1" class="form-select mb-2"></select>
+                    <h6>Термин 2</h6>
+                    <select id="classSelect2" class="form-select mb-2"></select>
+                    <select id="subclassSelect2" class="form-select mb-2"></select>
+                    <select id="termSelect2" class="form-select mb-2"></select>
+                `);
+                
+                
+                // Загружаем классы для обеих колонок
+                loadClassesModule("classSelect1");
+                loadClassesModule("classSelect2");
+
+                // Добавляем обработчики для загрузки подклассов и терминов
+                $("#classSelect1").change(function () {
+                    const selectedClass = $(this).val();
+                    loadSubClassesModule(selectedClass, "subclassSelect1");
+                });
+
+                $("#classSelect2").change(function () {
+                    const selectedClass = $(this).val();
+                    loadSubClassesModule(selectedClass, "subclassSelect2");
+                });
+
+                $("#subclassSelect1").change(function () {
+                    const selectedSubclass = $(this).val();
+                    loadTermsModule(selectedSubclass, "termSelect1");
+                });
+
+                $("#subclassSelect2").change(function () {
+                    const selectedSubclass = $(this).val();
+                    loadTermsModule(selectedSubclass, "termSelect2");
+                });
+
+                let selectedTerm1 = null;
+                let selectedTerm2 = null;
+                $('#termSelect1').change(function () {
+                    selectedTerm1 = $(this).val();
+                });
+
+                $('#termSelect2').change(function () {
+                    selectedTerm2 = $(this).val();
+                });
+
+
+                // Добавляем кнопку "Сохранить" в модальное окно
+                $('#relationModal .modal-footer').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveRelationBtn">Сохранить</button>
+                `);
+                
+                // Нажатие на кнопку "Сохранить"
+                $("#saveRelationBtn").click(function() {
+                    if (selectedTerm1 && selectedTerm2) {
+                        const relationType = $('#relationTypeText').text();
+                        createRelationBetweenTerms(selectedTerm1, selectedTerm2, relationType);
+                        loadGraph();
+                    } else {
+                        console.log("Пожалуйста, выберите оба термина перед сохранением.");
+                    }
+                });
+            }
+        });
+
+        // При открытии модального окна удаления
+        // При нажатии на опцию удаления
+        $(document).on("click", ".delete-option", function (event) {
+            event.preventDefault();
+
+            const deleteType = $(this).data("delete-type");
+            console.log("Выбрано удаление:", deleteType);   
+
+            // Открываем модальное окно
             $('#relationModal').modal('show');
-            $('#relationTypeText').text(relationType);
+
+            // Очищаем модальное окно
+            $('#relationModal .modal-body').html("");
+            $('#relationModal .modal-footer').html("");
+
+            if (deleteType === "class") {
+                // Удаление класса
+                $('#relationModalLabel').text("Удалить Класс");
+                $('#relationModal .modal-body').append(`
+                    <h6>Выберите класс</h6>
+                    <select id="deleteClassSelect" class="form-select mb-2"></select>
+                `);
+
+                // Загружаем классы
+                loadClassesModule("deleteClassSelect");
+            } else if (deleteType === "subclass") {
+                // Удаление подкласса
+                $('#relationModalLabel').text("Удалить Подкласс");
+                $('#relationModal .modal-body').append(`
+                    <h6>Выберите класс</h6>
+                    <select id="deleteClassSelect" class="form-select mb-2"></select>
+                    <h6>Выберите подкласс</h6>
+                    <select id="deleteSubclassSelect" class="form-select mb-2"></select>
+                `);
+
+                // Загружаем классы
+                loadClassesModule("deleteClassSelect");
+
+                // При изменении класса загружаем подклассы
+                $(document).on("change", "#deleteClassSelect", function () {
+                    const selectedClass = $(this).val();
+                    loadSubClassesModule(selectedClass, "deleteSubclassSelect");
+                });
+
+            } else if (deleteType === "term") {
+                // Удаление термина
+                $('#relationModalLabel').text("Удалить Термин");
+                $('#relationModal .modal-body').append(`
+                    <h6>Выберите класс</h6>
+                    <select id="deleteClassSelect" class="form-select mb-2"></select>
+                    <h6>Выберите подкласс</h6>
+                    <select id="deleteSubclassSelect" class="form-select mb-2"></select>
+                    <h6>Выберите термин</h6>
+                    <select id="deleteTermSelect" class="form-select mb-2"></select>
+                `);
+
+                // Загружаем классы
+                loadClassesModule("deleteClassSelect");
+
+                // При изменении класса загружаем подклассы
+                $(document).on("change", "#deleteClassSelect", function () {
+                    const selectedClass = $(this).val();
+                    loadSubClassesModule(selectedClass, "deleteSubclassSelect");
+                });
+
+                // При изменении подкласса загружаем термины
+                $(document).on("change", "#deleteSubclassSelect", function () {
+                    const selectedSubclass = $(this).val();
+                    loadTermsModule(selectedSubclass, "deleteTermSelect");
+                });
+            } else if (deleteType === "clear-all") {
+                // Очистка всех данных
+                $('#relationModalLabel').text("Очистить все данные");
+                $('#relationModal .modal-body').html("<p>Вы уверены, что хотите удалить все данные?</p>");
+            }
+
+            // Добавляем кнопку "Удалить" в модальное окно
+            $('#relationModal .modal-footer').html(`
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Удалить</button>
+            `);
+
+            // Обработчик для кнопки подтверждения удаления
+            $(document).on("click", "#confirmDeleteBtn", function () {
+                if (deleteType === "class") {
+                    const selectedClass = $("#deleteClassSelect").val();
+                    if (selectedClass) {
+                        deleteNode("class", selectedClass);
+                    }
+                } else if (deleteType === "subclass") {
+                    const selectedClass = $("#deleteClassSelect").val();
+                    const selectedSubclass = $("#deleteSubclassSelect").val();
+                    if (selectedClass && selectedSubclass) {
+                        deleteNode("subclass", selectedSubclass);
+                    }
+                } else if (deleteType === "term") {
+                    const selectedClass = $("#deleteClassSelect").val();
+                    const selectedSubclass = $("#deleteSubclassSelect").val();
+                    const selectedTerm = $("#deleteTermSelect").val();
+                    if (selectedClass && selectedSubclass && selectedTerm) {
+                        deleteNode("term", selectedTerm);
+                    }
+                } else if (deleteType === "clear-all") {
+                    deleteAllData();
+                }
+            });
+        });
+
+
+        $(document).on("click", ".add-option", function (event) {
+            event.preventDefault();
+
+            const addType = $(this).data("add-type");
+            $('#relationModal').modal('show');
+            $('#relationModal .modal-body').html('');
+            $('#relationModal .modal-footer').html('');
+
+            if (addType === "class") {
+                $('#relationModalLabel').text("Добавить Класс");
+                $('#relationModal .modal-body').append(`
+                    <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
+                    <input type="text" id="className" class="form-control mb-2" placeholder="Введите имя класса">
+                `);
+                $('#relationModal .modal-footer').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button id="addClassBtn" class="btn btn-success" data-type="Класс">Добавить</button>
+                `);
+            } else if (addType === "subclass") {
+                $('#relationModalLabel').text("Добавить Подкласс");
+                $('#relationModal .modal-body').append(`
+                    <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
+                    <select id="parentClassSelect" class="form-control mb-2">
+                        <option value="">Выберите родительский класс</option>
+                    </select>
+                    <input type="text" id="subclassName" class="form-control mb-2" placeholder="Подкласс">
+                `);
+                $('#relationModal .modal-footer').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button id="addSubclassBtn" class="btn btn-success" data-type="Подкласс">Добавить</button>
+                `);
+                loadClassesModule("parentClassSelect");
+            } else if (addType === "term") {
+                $('#relationModalLabel').text("Добавить Термин");
+                $('#relationModal .modal-body').append(`
+                    <span style="font-size: 12px;">(заполнять на русском)</span> <span style="color: red;">*</span>
+                    <select id="subclassSelect" class="form-control mb-2">
+                        <option value="">Выберите подкласс</option>
+                    </select>
+                    <input type="text" id="termName" class="form-control mb-2" placeholder="Термин">
+                `);
+                $('#relationModal .modal-footer').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button id="addTermBtn" class="btn btn-success" data-type="Термин">Добавить</button>
+                `);
+                 // Загрузить все подклассы для выбора
+                fetch(`http://127.0.0.1:8000/get_subclasses`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const select = document.getElementById("subclassSelect");
+                        select.innerHTML = '<option value="">Выберите подкласс</option>';
+                        data.subclasses.forEach(subclassName => {
+                            let option = document.createElement("option");
+                            option.value = subclassName;
+                            option.textContent = subclassName;
+                            select.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.log("Ошибка загрузки подклассов:", error));
+                }
+            });
+
+
+        // Открытие модального окна для языков
+        $(document).on("click", "#addClassBtn, #addSubclassBtn, #addTermBtn", function () {
             
+            const type = $(this).data("type");
+            console.log("Выбран тип:", type);
+            let inputValue = "";
+            let parentValue = "";
             
-            // Загружаем классы для обеих колонок
-            loadClassesModule("classSelect1");
-            loadClassesModule("classSelect2");
+            if (type == "Класс") {
+                inputValue = $("#className").val().trim();
+            } else if (type == "Подкласс") {
+                inputValue = $("#subclassName").val().trim();
+                parentValue = $("#parentClassSelect").val();
+            } else if (type == "Термин") {
+                inputValue = $("#termName").val().trim();
+                parentValue = $("#subclassSelect").val();
+            }
+
+            console.log("Введенное значение:", inputValue); 
+            console.log("Родительское значение:", parentValue);
+
+            if (!inputValue) {
+                alert(`Введите имя для ${type.toLowerCase()}!`);
+                return;
+            }
+
+            if ((type === "Подкласс" || type === "Термин") && !parentValue) {
+                alert("Выберите родительский класс/подкласс!");
+                return;
+            }
+
+
+            $("#saveModalBtn").data("type", type); // Сохраняем тип в кнопке
+            $("#saveModalBtn").data("parent", parentValue);
+                    
+            $('#confirmationModal').modal('show');
+            $('#relationModal').modal('hide'); // Скрываем модальное окно добавленияs
+
+            const labelText = {
+                "Класс": { ru: "Заполнен класс на русском:", kz: "Заполните класс на казахском:", en: "Заполните класс на английском:" },
+                "Подкласс": { ru: "Заполнен подкласс на русском:", kz: "Заполните подкласс на казахском:", en: "Заполните подкласс на английском:" },
+                "Термин": { ru: "Заполнен термин на русском:", kz: "Заполните термин на казахском:", en: "Заполните термин на английском:" }
+            };
+            $("#modalLabel").text(`Добавить ${type}`);
+            $("#modalLabelRu").text(labelText[type].ru);
+            $("#modalLabelKz").text(labelText[type].kz);
+            $("#modalLabelEn").text(labelText[type].en);
+            $("#modalInputRu").val(inputValue);
+            $("#modalInputKz").val("");
+            $("#modalInputEn").val("");
+            $("#saveModalBtn").data("type", type);  
+
+            // $("relationModal").modal("hide"); // Закрываем предыдущее модальное окно
+        });   
+
+
+        $(document).on("click", "#saveUfSynonymBtn", function () {
+            let ufType = $(this).data("uf-type"); // "UF-1" или "UF-2"
+            if (ufType === "UF-1"){
+                ufType = "UF_1";
+            } else if (ufType === "UF-2"){
+                ufType = "UF_2";
+            }
+            console.log("Выбранный тип UF:", ufType);
+            const term = $("#ufTermSelect").val();
+            const synonym_ru = $("#ufSynonymRu").val().trim();
+            const synonym_kz = $("#ufSynonymKz").val().trim();
+            const synonym_en = $("#ufSynonymEn").val().trim();
+
+            if (!term) {
+                alert("Выберите термин!");
+                return;
+            }
+            if (!synonym_ru) {
+                alert("Введите синоним на русском!");
+                return;
+            }
+
+            // Отправляем на сервер
+            fetch("http://127.0.0.1:8000/add_synonym", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    term: term,
+                    synonym_ru: synonym_ru,
+                    synonym_kz: synonym_kz,
+                    synonym_en: synonym_en,
+                    uf_type: ufType
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    $('#relationModal').modal('hide');
+                    loadGraph();
+                } else {
+                    alert("Ошибка: " + (data.detail || "Не удалось добавить синоним"));
+                }
+            })
+            .catch(error => {
+                alert("Ошибка при добавлении синонима: " + error);
+                console.log("Ошибка при добавлении синонима:", error);
+            });
         });
 
-        // При изменении класса загружаем подклассы
-        $("#classSelect1").change(function() {
-            const selectedClass = $(this).val();
-            loadSubClassesModule(selectedClass, "subclassSelect1");
+
+        // очищать содержимое модального окна при закрытии
+        $('#relationModal').on('hidden.bs.modal', function () {
+            // Очищаем содержимое модального окна при закрытии
+            $('#relationModal .modal-body').html("");
+            $('#relationModal .modal-footer').html("");
+            $('#relationModalLabel').text("");
+            $(document).off("click", "#confirmDeleteBtn"); // Удаляем обработчик события
         });
 
-        $("#classSelect2").change(function() {
-            const selectedClass = $(this).val();
-            loadSubClassesModule(selectedClass, "subclassSelect2");
-        });
+        // Функция для удаления узла
+        function deleteNode(type, name) {
+            fetch(`http://127.0.0.1:8000/delete_node`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type: type, name: name }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    console.log(`${type} "${name}" успешно удален.`);
+                    $('#relationModal').modal('hide');
+                    loadClassesAndSubClasses(); // Обновляем списки
+                    loadGraph(); // Обновляем граф
+                } else {
+                    alert("Ошибка при удалении: " + data.error);
+                }
+            })
+            .catch(error => console.error("Ошибка при удалении:", error));
+        }
 
-        // При изменении подкласса загружаем термины
-        $("#subclassSelect1").change(function() {
-            const selectedSubclass = $(this).val();
-            loadTermsModule(selectedSubclass, "termSelect1");
-        });
-
-        $("#subclassSelect2").change(function() {
-            const selectedSubclass = $(this).val();
-            loadTermsModule(selectedSubclass, "termSelect2");
-        });
+        function deleteAllData() {
+             fetch("http://127.0.0.1:8000/delete_all_data", { method: "DELETE" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        console.log("Все данные успешно удалены!");
+                        $('#relationModal').modal('hide');
+                        loadClassesAndSubClasses(); // Обновляем списки
+                        loadGraph(); // Обновляем граф
+                    } else {
+                        alert("Ошибка при удалении данных: " + data.error);
+                    }
+                })
+                .catch(error => console.error("Ошибка при удалении данных:", error));
+        }
 
         // Функция для отправки данных на сервер
-        function createRelation(term1, term2, relationType) {
+        function createRelationBetweenTerms(term1, term2, relationType) {
             console.log("Отправляем на сервер:", {
                 term1: term1,
                 term2: term2,
                 relationType: relationType // Посмотрим, что именно отправляется
             });
 
-            fetch("https://thesaurus-api-ntx3.onrender.com/create_relation", {
+            fetch("http://127.0.0.1:8000/create_relation_between_terms", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -264,48 +659,22 @@
                 }),
             })
             .then(response => response.json())
-            .then(data => {
+            .then(data => { 
                 console.log("Ответ сервера:", data);
                 if (data.message === "Связь успешно создана") {
                 // Закрытие модального окна
                     $('#relationModal').modal('hide');
+                    loadGraph();
                 } else {
-                    alert("Произошла ошибка: " + (data.error || "Неизвестная ошибка"));
+                    console.log("Произошла ошибка: " + (data.error || "Неизвестная ошибка"));
                 }
             })
             .catch(error => console.error("Ошибка:", error));
-        }
-
-        // Отслеживаем выбор терминов
-        let selectedTerm1 = null;
-        let selectedTerm2 = null;
-
-        // Когда выбрали термин 1
-        $("#termSelect1").change(function() {
-            selectedTerm1 = $(this).val();
-            checkAndCreateRelation();
-        });
-
-        // Когда выбрали термин 2
-        $("#termSelect2").change(function() {
-            selectedTerm2 = $(this).val();
-            checkAndCreateRelation();
-        });
-
-
-        // Нажатие на кнопку "Сохранить"
-        $("#saveRelationBtn").click(function() {
-            if (selectedTerm1 && selectedTerm2) {
-                const relationType = $('#relationTypeText').text();
-                createRelation(selectedTerm1, selectedTerm2, relationType);
-            } else {
-                alert("Пожалуйста, выберите оба термина перед сохранением.");
-            }
-        });
+        }   
 
         // Загрузка всех классов
         function loadClassesModule(selectElementId) {
-            fetch("https://thesaurus-api-ntx3.onrender.com/classes")
+            fetch("http://127.0.0.1:8000/classes")
                 .then(response => response.json())
                 .then(data => {
                     console.log("Полученные классы:", data);
@@ -318,14 +687,14 @@
                         select.appendChild(option);
                     });
                 })
-                .catch(error => console.error("Ошибка загрузки классов:", error));
+                .catch(error => console.log("Ошибка загрузки классов:", error));
         }
 
         // Загрузка подклассов
         function loadSubClassesModule(className, selectElementId) {
             if (!className) return;
 
-            fetch(`https://thesaurus-api-ntx3.onrender.com/subclasses/${className}`)
+            fetch(`http://127.0.0.1:8000/subclasses/${className}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("Полученные подклассы:", data);
@@ -338,14 +707,14 @@
                         select.appendChild(option);
                     });
                 })
-                .catch(error => console.error("Ошибка загрузки подклассов:", error));
+                .catch(error => console.log("Ошибка загрузки подклассов:", error));
         }
 
         // Загрузка терминов
         function loadTermsModule(subclassName, selectElementId) {
             if (!subclassName) return;
 
-            fetch(`https://thesaurus-api-ntx3.onrender.com/terms/${subclassName}`)
+            fetch(`http://127.0.0.1:8000/terms/${subclassName}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("Полученные термины:", data);
@@ -361,6 +730,9 @@
                 .catch(error => console.error("Ошибка загрузки терминов:", error));
         }
 
+        $(document).ready(function () {
+            loadClassesAndSubClasses();
+        });
 
         // модальное окно для добавление классов, подклассов и терминов на разных языках
         $(document).ready(function () {
@@ -379,7 +751,7 @@
                 $("#modalInputKz").val("");
                 $("#modalInputEn").val("");
 
-                $("#saveModalBtn").data("type", type);
+                $("#saveModalBtn").data("type", type);  
             }
 
             $("#addClassBtn").click(function () {
@@ -397,33 +769,19 @@
                 if (termName) openModal("Термин", termName);
             });
 
+
+
             $("#saveModalBtn").click(function () {
                 let type = $(this).data("type");
+                console.log("Выбраный тип" + type)
+                let parent = $(this).data("parent") || null;
                 let ru = $("#modalInputRu").val().trim();
                 let kz = $("#modalInputKz").val().trim();
                 let en = $("#modalInputEn").val().trim();
-                let parent = null;  // <-- Добавляем инициализацию 
 
                 if (!ru) {
-                    alert("Основное поле (русский) не может быть пустым!");
+                    console.log("Основное поле (русский) не может быть пустым!");
                     return;
-                }
-
-                // Если добавляется подкласс, то берем выбранный родительский класс
-                if (type === "Подкласс") {
-                    parent = $("#parentClassSelect").val();  // Выпадающий список с классами
-                    if (!parent) {
-                        alert("Выберите родительский класс!");
-                        return;
-                    }
-                }
-
-                if (type === "Термин") {
-                    parent = $("#subclassSelect").val();  // Выпадающий список с классами
-                    if (!parent) {
-                        alert("Выберите родительский класс!");
-                        return;
-                    }
                 }
 
                 let requestData = {
@@ -434,7 +792,7 @@
                     parent: parent  // Добавляем родителя
                 };
 
-                fetch("https://thesaurus-api-ntx3.onrender.com/add_node/", {
+                fetch("http://127.0.0.1:8000/add_node/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(requestData)
@@ -442,29 +800,28 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("Данные успешно добавлены!");
+                        // alert("Данные успешно добавлены!");
                         loadGraph();
-                        $("#confirmationModal").modal("hide");
-                        
+
+                                
                         // Очистка полей после добавления
                         $("#className").val("");
                         $("#subclassName").val("");
                         $("#termName").val("");
-                        
+                        $("#confirmationModal").modal("hide");
+
+                            
                         // Обновление выпадающих списков
-                        loadClasses();
-                        loadSubclasses();
-                        loadTerms();
+                        loadClassesAndSubClasses();
                     } else {
                         alert("Ошибка: " + data.detail);
                     }
-                }).catch(error => console.error("Ошибка при добавлении узла:", error));
+                }).catch(error => console.log("Ошибка при добавлении узла:", error));
             });
         });
 
-
         // кнопка проверка сервера
-        document.getElementById("checkServerBtn").addEventListener("click", function() {
+        $("#checkServerBtn").click(function() {
             const statusElement = document.getElementById("serverStatus");
             const loadingIndicator = document.getElementById("loadingIndicator");
 
@@ -472,7 +829,7 @@
             loadingIndicator.style.display = "block";
             statusElement.innerHTML = "";
 
-            fetch("https://thesaurus-api-ntx3.onrender.com/")
+            fetch("http://127.0.0.1:8000/")
                 .then(response => response.json())
                 .then(data => {
                     setTimeout(() => {
@@ -496,58 +853,48 @@
                 });
         });
 
-        // загрузка всех классов
-        function loadClasses() {
-            fetch("https://thesaurus-api-ntx3.onrender.com/get_classes")
+        function loadClassesAndSubClasses() {
+            // Загружаем классы
+            fetch(`http://127.0.0.1:8000/get_classes`)
                 .then(response => response.json())
                 .then(data => {
-                    const select = document.getElementById("parentClassSelect");
-                    select.innerHTML = '<option value="">Выберите родительский класс</option>';
+                    const classSelect = document.getElementById("parentClassSelect");
+                    classSelect.innerHTML = '<option value="">Выберите родительский класс</option>';
                     data.classes.forEach(className => {
                         let option = document.createElement("option");
                         option.value = className;
                         option.textContent = className;
-                        select.appendChild(option);
+                        classSelect.appendChild(option);
                     });
+                    console.log("Классы успешно загружены.");
                 })
-                .catch(error => console.error("Ошибка загрузки классов:", error));
-        }
+                .catch(error => console.log("Ошибка загрузки классов:", error));
 
-          // загрузка всех классов
-          function loadSubClasses() {
-            fetch("https://thesaurus-api-ntx3.onrender.com/get_subclasses")
+            // Загружаем подклассы
+            fetch(`http://127.0.0.1:8000/get_subclasses`)
                 .then(response => response.json())
                 .then(data => {
-                    const select = document.getElementById("subclassSelect");
-                    select.innerHTML = '<option value="">Выберите родительский подкласс</option>';
-                    data.subclasses.forEach(className => {
+                    const subclassSelect = document.getElementById("subclassSelect");
+                    subclassSelect.innerHTML = '<option value="">Выберите подкласс</option>';
+                    data.subclasses.forEach(subclassName => {
                         let option = document.createElement("option");
-                        option.value = className;
-                        option.textContent = className;
-                        select.appendChild(option);
+                        option.value = subclassName;
+                        option.textContent = subclassName;
+                        subclassSelect.appendChild(option);
                     });
+                    console.log("Подклассы успешно загружены.");
                 })
-                .catch(error => console.error("Ошибка загрузки классов:", error));
+                .catch(error => console.log("Ошибка загрузки подклассов:", error));
         }
 
-        $(document).ready(function () {
-            loadClasses(); 
-        });
-
-        
-        $(document).ready(function () {
-            loadSubClasses(); 
-        });
-
-
         // обновление данных из бд при нажаите на кнопку
-        document.getElementById("loadDataBtn").addEventListener("click", function() {
+        $("#loadDataBtn").click(function() {
             loadGraph();
         });
 
         // визуализация
         function loadGraph() {
-            fetch("https://thesaurus-api-ntx3.onrender.com/graph_data")
+            fetch("http://127.0.0.1:8000/graph_data")
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
